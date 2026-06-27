@@ -77,8 +77,11 @@ bot_hyperliquid/
 ├── risk.py                 # Position sizing, SL/TP/SAR exit evaluation
 ├── telegram_reporter.py    # Hourly Markdown reports, FIFO PnL (long + short)
 ├── main.py                 # 15-second loop, orchestration, gc.collect(), file logging
+├── backtest.py             # Multi-period backtest (Binance 15m, vectorized)
+├── test_strategy.py        # Unit tests — 32 checks (indicators, sizing, exits, FIFO)
 ├── requirements.txt        # ccxt, pandas, numpy, requests
 ├── run.sh                  # Bootstrap: venv + deps + .env + launch
+├── install.sh              # One-script installer (interactive, systemd)
 ├── hyperliquid-bot.service # systemd unit (Ubuntu 26.04 LTS)
 ├── .env.example            # Environment variable template
 └── .gitignore
@@ -112,6 +115,22 @@ bot_hyperliquid/
 ## Repo
 
 https://github.com/juancito8812/hyperliquid-tradingbot
+
+## Backtest Results (Binance 15m, 100 USDC, 3.16 years)
+
+| Period | PnL | % | Trades | Win% | PF | MaxDD |
+|--------|-----|---|--------|------|-----|-------|
+| 7 days | +$159.69 | +39.2% | 55 | 29% | 1.79 | 11.4% |
+| 15 days | +$121.89 | +27.4% | 112 | 24% | 1.25 | 33.0% |
+| 30 days | +$115.45 | +25.5% | 221 | 20% | 1.11 | 33.0% |
+| 90 days | -$294.94 | -34.2% | 698 | 19% | 0.90 | 58.7% |
+| 180 days | -$294.71 | -34.2% | 1,328 | 21% | 0.95 | 66.6% |
+| 1 year | +$80.81 | +16.6% | 2,633 | 22% | 1.01 | 66.6% |
+| 3 years | +$217.43 | +62.1% | 7,668 | 22% | 1.01 | 82.7% |
+
+**Final balance: $317.43** (from $100). Run with `python backtest.py`.
+Strategy profitable long-term (3y: +62.1%) with trend-following profile:
+low win rate (~22%), profit factor >1, but large drawdowns (83% max).
 
 ## Design Docs
 

@@ -1,7 +1,9 @@
 import gc
+import os
 import time
 import logging
 import traceback
+from logging.handlers import RotatingFileHandler
 from datetime import datetime, timezone
 
 from config import SYMBOLS, TIMEFRAME, CANDLE_LIMIT, LOOP_INTERVAL_SECONDS
@@ -17,11 +19,18 @@ from indicators import compute_all
 from risk import calculate_position_size, evaluate_exits, evaluate_entry
 from telegram_reporter import send_hourly_report
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+_format = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+_datefmt = "%Y-%m-%d %H:%M:%S"
+
+log_file = os.environ.get("LOG_FILE", "")
+if log_file:
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+    handler = RotatingFileHandler(log_file, maxBytes=10 * 1024 * 1024, backupCount=7)
+    handler.setFormatter(logging.Formatter(_format, _datefmt))
+    logging.basicConfig(level=logging.INFO, handlers=[handler])
+else:
+    logging.basicConfig(level=logging.INFO, format=_format, datefmt=_datefmt)
+
 logger = logging.getLogger("main")
 
 

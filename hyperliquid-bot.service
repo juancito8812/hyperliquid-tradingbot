@@ -1,0 +1,25 @@
+[Unit]
+Description=Hyperliquid Trading Bot (SOL/ETH/BTC)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%u
+WorkingDirectory=/opt/hyperliquid-bot
+EnvironmentFile=/opt/hyperliquid-bot/.env
+ExecStart=/opt/hyperliquid-bot/venv/bin/python /opt/hyperliquid-bot/main.py
+Restart=always
+RestartSec=15
+MemoryMax=1500M
+CPUQuota=80%
+Nice=10
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/hyperliquid-bot/logs
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

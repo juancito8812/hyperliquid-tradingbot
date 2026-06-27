@@ -6,7 +6,13 @@ Algorithmic trading bot for Hyperliquid Testnet. Trades **SOL/USDC, ETH/USDC, BT
 
 ## Quick Start
 
-**One-liner (Ubuntu 26.04 LTS):**
+**One-script install (Ubuntu 26.04 LTS):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/juancito8812/hyperliquid-tradingbot/master/install.sh | bash
+# Edit .env, then: sudo systemctl start hyperliquid-bot
+```
+
+**Manual:**
 ```bash
 chmod +x run.sh && cp .env.example .env && nano .env && ./run.sh
 ```
@@ -25,26 +31,27 @@ python main.py
 
 Runs indefinitely — Ctrl+C to stop.
 
-## Ubuntu 26.04 LTS Deployment (systemd)
+## Ubuntu 26.04 LTS Deployment
 
+`install.sh` does everything: clone, venv, deps, systemd unit, auto-start on boot.
+```bash
+curl -fsSL https://raw.githubusercontent.com/juancito8812/hyperliquid-tradingbot/master/install.sh | bash -s /opt/hyperliquid-bot
+# Or: bash install.sh /custom/path
+```
+
+**Manual install:**
 ```bash
 git clone https://github.com/juancito8812/hyperliquid-tradingbot.git /opt/hyperliquid-bot
 cd /opt/hyperliquid-bot
-cp .env.example .env && nano .env    # fill credentials
-chmod +x run.sh && ./run.sh           # bootstrap venv + deps + test run
+cp .env.example .env && nano .env
+chmod +x run.sh && ./run.sh           # test run
 sudo cp hyperliquid-bot.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now hyperliquid-bot
-sudo systemctl status hyperliquid-bot  # verify running
 sudo journalctl -u hyperliquid-bot -f # tail logs
 ```
-
-**Service features:**
-- Auto-restart on crash (RestartSec=15s)
-- Memory cap: 1.5 GB (MemoryMax)
-- CPU cap: 80% of one core (CPUQuota)
-- Hardened: no new privileges, read-only filesystem except logs
-- File logging with rotation: 10 MB × 7 backups (`LOG_FILE` env var)
+- Systemd: auto-restart, MemoryMax=1.5G, CPUQuota=80%, hardened sandbox
+- File logging: RotatingFileHandler (10 MB x 7) when LOG_FILE env var set
 
 ## Strategy Summary
 
